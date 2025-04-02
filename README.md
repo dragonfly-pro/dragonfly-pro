@@ -1,47 +1,42 @@
-<!--suppress ALL -->
-<img height="310" alt="image" src="https://user-images.githubusercontent.com/16114089/121805566-0cd81280-cc4c-11eb-9b7d-b5f8a6db4f8d.png" align="right">
+# dragonfly-pro
+⚠️ **Warning**: This project is not fully complete.
 
-# Dragonfly
+A Dragonfly fork that adds multi-version support, exposes required APIs, and includes more vanilla features while maintaining compatibility with upstream.
 
-Dragonfly is a heavily asynchronous server software for Minecraft: Bedrock Edition written in Go. It was written with scalability
-and simplicity in mind and aims to make the process of setting up a server and modifying it easy. Unlike other
-Minecraft server software, Dragonfly is generally used as a library to extend.
+## What is the current problem in original the Dragonfly?
+- They don't want to expose an API to access the Minecraft protocol, which is good, but it may limit developers from using packets since Dragonfly's abstraction layer for Minecraft packets is not fully implemented yet.
+  - "_but there is reflect_"
+    Well, we used that before, but it significantly degraded performance. For example, as you know, accessing a private field of a struct using reflection is ~30-100x slower than direct access.
+- We want to merge good PRs that were never merged in Dragonfly.
+- Gophertunnel's multi-version API is not sufficient. For example, we can't add support for versions below 1.20.60 because they use a different compression system, which we can't do that in Gophertunnel.
 
-[![Discord Banner 2](https://discordapp.com/api/guilds/623638955262345216/widget.png?style=banner2)](https://discord.gg/U4kFWHhTNR)
+## Goals
+(subject to change)
+- [ ] Multi Version
+- [ ] Entity Rework
+- [ ] Entity Link API
+  - [ ] Fishing Rod
+  - [ ] Entity Riding
+- [ ] Optimize performance
+  - [ ] Broadcast packets (like PocketMine): encode once, send to multiple recipients.
+  - [ ] Packet caching for heavy packets
+    - [ ] packet.CraftingData
+- [ ] Fix known dragonfly bugs
+  - [ ] https://github.com/df-mc/dragonfly/issues/989
+  - [ ] https://github.com/df-mc/dragonfly/issues/1003
+- [ ] Blocks
+  - [ ] Snow Layer
+- [ ] Handler
+  - [ ] Block Update Handler
+    - [ ] neighbour update
+    - [ ] random tick update
+  - [ ] Packet Handler: There's a library like https://github.com/bedrock-gophers/intercept, but we can't get the caller *world.Tx when handling server packets.
+  - [ ] Crafting Handler
+  - [ ] Centralized Player Inventory Handler
 
-## Getting started
-Running Dragonfly requires at least **Go 1.23**. After starting the server through one of the methods below,
-**ctrl+c** may be used to shut down the server. Also check out the [wiki](https://github.com/df-mc/dragonfly/wiki) for
-more detailed info.
-
-#### Installation as library
-```shell
-go mod init github.com/user/module
-go get github.com/df-mc/dragonfly
+## How to use
+Just add this at the end of the `go.mod` file:
 ```
-
-![SetupLibrary](https://user-images.githubusercontent.com/16114089/121804512-0f843900-cc47-11eb-9320-d195393b5a1f.gif)
-
-#### Installation of the latest commit
-```shell
-git clone https://github.com/df-mc/dragonfly
-cd dragonfly
-go run main.go
+replace github.com/df-mc/dragonfly => github.com/dragonfly-pro/dragonfly-pro master
 ```
-
-![SetupClone](https://user-images.githubusercontent.com/16114089/121804495-ff6c5980-cc46-11eb-8e31-df4d94782e5b.gif)
-
-## Developer info
-[![Go Reference](https://pkg.go.dev/badge/github.com/df-mc/dragonfly/server.svg)](https://pkg.go.dev/github.com/df-mc/dragonfly/server)
-
-Dragonfly features a well-documented codebase with an easy-to-use API. Documentation may be found
-[here](https://pkg.go.dev/github.com/df-mc/dragonfly/server) and in the subpackages found by clicking *Directories*.
-
-Publishing your project on GitHub? Consider adding the **[#df-mc](https://github.com/topic/df-mc)** topic to your
-repository and opening a pull request at [df-wiki](https://github.com/df-mc/wiki) adding your project as a Community
-Project to improve its visibility.
-
-## Contributing
-Contributions are very welcome! Issues, pull requests and feature requests are highly appreciated. Opening a pull
-request? Consider joining our [Discord server](https://discord.gg/U4kFWHhTNR) to discuss your changes! Also have a read through the
-[CONTRIBUTING.md](https://github.com/df-mc/dragonfly/blob/master/.github/CONTRIBUTING.md) for more info.
+After that, run the `go get` command
